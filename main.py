@@ -15,40 +15,38 @@ broadcast = Broadcast("redis://localhost:6379")
 type_defs = gql("""
     
     type Query {
-        hello: String
+        hell: String
     }
 
-    type Subscription {
-        aisMessageReceived: String
-    }
+   
 """)
 
 query = QueryType()
-subscription = SubscriptionType()
+# subscription = SubscriptionType()
 
-@query.field("hello")
+@query.field("hell")
 def resolve_hello(*_):
     return "Hello, world!"
 
-@subscription.source("aisMessageReceived")
-async def subscribe_ais_message(_, info):
-    print("Subscribing to AIS messages...")
-    async with broadcast.subscribe(channel="ais_messages") as subscriber:
-        print("Subscription established for AIS messages.")
-        async for event in subscriber:
-            message = event.message
-            ship_name = message.get('MetaData', {}).get('ShipName')
-            if ship_name:
-                print(f"Received AIS message for Ship: {ship_name}")
-                yield ship_name
-            else:
-                print("Received AIS message without ShipName.")
+# @subscription.source("aisMessageReceived")
+# async def subscribe_ais_message(_, info):
+#     print("Subscribing to AIS messages...")
+#     async with broadcast.subscribe(channel="ais_messages") as subscriber:
+#         print("Subscription established for AIS messages.")
+#         async for event in subscriber:
+#             message = event.message
+#             ship_name = message.get('MetaData', {}).get('ShipName')
+#             if ship_name:
+#                 print(f"Received AIS message for Ship: {ship_name}")
+#                 yield ship_name
+#             else:
+#                 print("Received AIS message without ShipName.")
 
-@subscription.field("aisMessageReceived")
-def resolve_ais_message(message, *_):
-    return message
+# @subscription.field("aisMessageReceived")
+# def resolve_ais_message(message, *_):
+#     return message
 
-schema = make_executable_schema(type_defs, query, subscription)
+schema = make_executable_schema(type_defs, query)
 
 graphql = GraphQL(
     schema=schema,
